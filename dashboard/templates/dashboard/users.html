@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Admin Menu</h5>
+                    <div class="list-group">
+                        <a href="{% url 'dashboard:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'dashboard:users' %}" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-people"></i> Users
+                        </a>
+                        <a href="{% url 'dashboard:posts' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-file-text"></i> Posts
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">User Management</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        {% if user.profile_picture and user.profile_picture.url %}
+                                            <img src="{{ user.profile_picture.url }}" 
+                                                 alt="{{ user.full_name }}'s profile picture"
+                                                 class="rounded-circle"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{% static 'images/default-avatar.png' %}" 
+                                                 alt="Default profile picture"
+                                                 class="rounded-circle"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% endif %}
+                                        {{ user.full_name }}
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td><span class="badge bg-secondary">{{ user.role|title }}</span></td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.last_login|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            {% if user.is_superuser %}
+                                                {% if request.user == user %}
+                                                <a href="{% url 'dashboard:user_edit' user.id %}" class="btn btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                {% endif %}
+                                            {% else %}
+                                                <a href="{% url 'dashboard:user_edit' user.id %}" class="btn btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form method="POST" action="{% url 'dashboard:user_delete' user.id %}" class="d-inline" 
+                                                      onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if users.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if users.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in users.paginator.page_range %}
+                            <li class="page-item {% if users.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% load widget_tweaks %}
+{% load static %}
+
+<form method="POST" enctype="multipart/form-data" class="row g-3">
+  {% csrf_token %}
+
+  <!-- Title Field -->
+  <div class="col-md-6">
+    <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+    {% render_field form.title class="form-control" %}
+  </div>
+
+  <!-- Category Field -->
+  <div class="col-md-6">
+    <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+    {% render_field form.category class="form-control" %}
+  </div>
+
+  <!-- Image Field -->
+  <div class="col-12">
+    <label for="{{ form.image.id_for_label }}" class="form-label">Image (optional)</label>
+    {% render_field form.image class="form-control" %}
+  </div>
+
+  <!-- Content Field -->
+  <div class="col-12">
+    <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+    {% render_field form.content class="form-control" rows="5" %}
+  </div>
+
+  <!-- Submit & Back Buttons -->
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">{{ submit_label|default:"Save" }}</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+  </div>
+</form>

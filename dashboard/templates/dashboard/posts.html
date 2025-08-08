@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Admin Menu</h5>
+                    <div class="list-group">
+                        <a href="{% url 'dashboard:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'dashboard:users' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-people"></i> Users
+                        </a>
+                        <a href="{% url 'dashboard:posts' %}" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-file-text"></i> Posts
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="card-title mb-0">Post Management</h2>
+                        <a href="{% url 'post-new' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> New Post
+                        </a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Date Posted</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for post in posts %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'post-detail' post.pk %}" class="text-decoration-none">
+                                            {{ post.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ post.author.full_name }}</td>
+                                    <td>{{ post.date_posted|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if post.status == 'published' %}
+                                            <span class="badge bg-success">Published</span>
+                                        {% elif post.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">Pending Review</span>
+                                        {% elif post.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Draft</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'post-edit' post.pk %}" class="btn btn-outline-primary">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            {% if request.user.is_staff %}
+                                            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#moderatePost_{{ post.pk }}">
+                                                <i class="bi bi-shield-check"></i>
+                                            </button>
+                                            {% endif %}
+                                            {% if request.user.is_superuser or request.user == post.author %}
+                                            <form method="POST" action="{% url 'post-delete' post.pk %}" class="d-inline"
+                                                  onsubmit="return confirm('Are you sure?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <p class="text-muted mb-0">No posts found</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if posts.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if posts.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in posts.paginator.page_range %}
+                            <li class="page-item {% if posts.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if posts.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ posts.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Moderation Modals -->
+{% if request.user.is_staff %}
+{% for post in posts %}
+<div class="modal fade" id="moderatePost_{{ post.pk }}" tabindex="-1" aria-labelledby="moderatePostLabel_{{ post.pk }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="moderatePostLabel_{{ post.pk }}">Moderate Post: {{ post.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'dashboard:moderate_post' post.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            {% for status_value, status_label in post.STATUS_CHOICES %}
+                            <option value="{{ status_value }}" {% if post.status == status_value %}selected{% endif %}>
+                                {{ status_label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Moderator Note</label>
+                        <textarea name="moderator_note" class="form-control" rows="3">{{ post.moderator_note }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

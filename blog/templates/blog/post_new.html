@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container mt-4">
+  <h2 class="mb-4">New Post</h2>
+
+  {% include "partials/_post_form.html" with submit_label="Save" %}
+</section>
+{% endblock %}

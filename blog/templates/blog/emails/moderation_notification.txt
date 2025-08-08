@@ -1,0 +1,13 @@
+Post Moderation Update
+
+Hello {{ post.author.full_name }},
+
+Your post "{{ post.title }}" has been {{ status }}.
+
+{% if moderator_note %}
+Moderator Note:
+{{ moderator_note }}
+{% endif %}
+
+Best regards,
+{{ site_name }} Team
