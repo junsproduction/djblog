@@ -193,6 +193,79 @@ body {
 }
 
 /* Card Styles */
+.card.post-card {
+    background-color: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 32px;
+    transition: box-shadow 0.2s, transform 0.2s;
+    padding: 0;
+}
+
+.card.post-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+    transform: translateY(-2px);
+}
+
+.card-img-top.post-image {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    max-height: 220px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #eaeaea;
+    background: #f8f8f8;
+}
+
+.author-name {
+    font-size: 1rem;
+    color: #333;
+}
+
+.category-badge {
+    font-size: 0.8rem;
+    padding: 0.3em 0.7em;
+    border-radius: 8px;
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #eaeaea;
+    font-weight: 500;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #222;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #555;
+}
+
+.btn-outline-primary.btn-sm {
+    border-radius: 20px;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline-primary.btn-sm:hover {
+    background: #667eea;
+    color: #fff;
+    border-color: #667eea;
+}
+
+/* Old card styles for other cards */
 .card {
     background-color: #fff;
     border: 1px solid #ddd;
