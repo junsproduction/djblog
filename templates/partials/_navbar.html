@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm mb-4">
     <div class="container">
         <!-- Brand -->
         <a class="navbar-brand" href="{% url 'home' %}">DJ Blog</a>
@@ -11,9 +11,21 @@
 
         <!-- Navigation items -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-2">
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">Home</a>
+                </li>
+                <!-- Category Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Categories
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                        <li><a class="dropdown-item" href="{% url 'home' %}">All</a></li>
+                        {% for cat in categories %}
+                        <li><a class="dropdown-item" href="{% url 'category-posts' cat.slug %}">{{ cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
@@ -24,6 +36,12 @@
                 </li>
                 {% endif %}
             </ul>
+
+            <!-- Search Bar -->
+            <form class="d-flex me-auto" method="get" action="{% url 'search' %}">
+                <input class="form-control me-2" type="search" name="q" placeholder="Search posts..." aria-label="Search">
+                <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+            </form>
 
             <!-- User menu -->
             <ul class="navbar-nav">

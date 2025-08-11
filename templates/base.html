@@ -18,6 +18,7 @@
     {% include 'partials/_navbar.html' %}
     
     <main class="container">
+        {% block breadcrumbs %}{% endblock %}
         {% block content %}
         {% endblock %}
     </main>

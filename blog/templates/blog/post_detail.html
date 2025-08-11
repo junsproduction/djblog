@@ -2,6 +2,16 @@
 
 {% block title %}{{ post.title }}{% endblock %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'category-posts' post.category.slug %}">{{ post.category.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ post.title|truncatechars:50 }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="card shadow-sm">

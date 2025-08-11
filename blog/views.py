@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Post
+from .models import Post, Category
 from .forms import PostForm
 import logging
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -100,3 +101,33 @@ def my_posts(request):
         'status_choices': Post.STATUS_CHOICES,
     }
     return render(request, 'blog/my_posts.html', context)
+
+
+def search(request):
+    query = request.GET.get('q', '')
+    posts = Post.objects.filter(
+        Q(title__icontains=query) | Q(content__icontains=query),
+        status='published'
+    ).order_by('-date_posted') if query else Post.objects.none()
+    paginator = Paginator(posts, 5)
+    page = request.GET.get('page')
+    posts = paginator.get_page(page)
+    categories = Category.objects.all()
+    return render(request, 'blog/search_results.html', {
+        'posts': posts,
+        'query': query,
+        'categories': categories,
+    })
+
+def category_posts(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    posts = Post.objects.filter(category=category, status='published').order_by('-date_posted')
+    paginator = Paginator(posts, 5)
+    page = request.GET.get('page')
+    posts = paginator.get_page(page)
+    categories = Category.objects.all()
+    return render(request, 'blog/category_posts.html', {
+        'category': category,
+        'posts': posts,
+        'categories': categories,
+    })
