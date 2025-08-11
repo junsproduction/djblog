@@ -284,11 +284,6 @@ body {
     object-fit: cover;
 }
 
-/* Typography */
-h1, h2 {
-    color: #333;
-}
-
 /* Form Styles */
 .form-container {
     max-width: 600px;
