@@ -296,7 +296,7 @@ body {
     transform: scale(1.02);
 }
 
-/* Footer - Consolidated */
+/* Footer - Fixed text color */
 footer.bg-dark {
     background-color: #212529 !important;
     color: #fff !important;
@@ -306,22 +306,27 @@ footer.bg-dark * {
     color: #fff !important;
 }
 
-footer.bg-dark a.text-muted {
-    color: #adb5bd !important;
+footer.bg-dark p,
+footer.bg-dark h5,
+footer.bg-dark h6,
+footer.bg-dark small,
+footer.bg-dark a {
+    color: #fff !important;
+}
+
+footer.bg-dark a.text-muted,
+footer.bg-dark .text-muted {
+    color: #ccc !important;
     transition: color 0.2s ease;
 }
 
-footer.bg-dark a.text-muted:hover {
-    color: #f8f9fa !important;
+footer.bg-dark a.text-muted:hover,
+footer.bg-dark .text-muted:hover {
+    color: #fff !important;
 }
 
-footer.bg-dark a.text-light {
-    color: #f8f9fa !important;
-    transition: color 0.2s ease;
-}
-
-footer.bg-dark a.text-light:hover {
-    color: #0d6efd !important;
+footer.bg-dark a:hover {
+    color: #ffd700 !important;
 }
 
 footer.bg-dark .social-links a {
