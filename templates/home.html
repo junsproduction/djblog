@@ -1,11 +1,72 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Juni's Blog - Web Development & Tech Insights{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">All Posts</h1>
-    <p>{{ greeting }}</p>
-    <p>Today is: <span id="clock"></span></p>
+    <!-- Hero Section -->
+    <section class="hero-section py-5 mb-5">
+        <div class="container">
+            <div class="row align-items-center min-vh-50">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title display-4 fw-bold mb-4">
+                        Welcome to <span class="text-primary">Juni's Blog</span>
+                    </h1>
+                    <p class="hero-subtitle lead mb-4 text-muted">
+                        Sharing insights about web development, Django, coding journey, and tech adventures. 
+                        Join me as I explore the world of programming and share what I learn along the way.
+                    </p>
+                    <div class="hero-stats mb-4">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <h3 class="fw-bold text-primary">{{ posts.count }}</h3>
+                                    <p class="text-muted mb-0">Articles Published</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <h3 class="fw-bold text-success">{{ greeting }}</h3>
+                                    <p class="text-muted mb-0">Current Status</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-item">
+                                    <h3 class="fw-bold text-info" id="clock"></h3>
+                                    <p class="text-muted mb-0">Current Time</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="#posts-section" class="btn btn-primary btn-lg me-3">
+                            <i class="bi bi-book-open"></i> Read Latest Posts
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'post-new' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Write New Post
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-person-plus"></i> Join the Community
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Posts Section -->
+    <section id="posts-section" class="posts-section">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="section-title fw-bold mb-3">
+                        <i class="bi bi-journal-text text-primary"></i> Latest Articles
+                    </h2>
+                    <p class="text-muted">Discover the latest insights, tutorials, and thoughts from my coding journey.</p>
+                </div>
+            </div>
     {% for post in posts %}
     <div class="card mb-3 shadow-sm">
         <div class="row g-0">
@@ -56,9 +117,21 @@
         </div>
     </div>
     {% empty %}
-    <p>No posts available.</p>
-    <hr>
-    {% endfor %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted">No posts available yet</h3>
+                    <p class="text-muted">Be the first to share your thoughts!</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'post-new' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Write First Post
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
     
     <script>
         function updateClock() {
@@ -68,5 +141,15 @@
         }
         setInterval(updateClock, 1000);
         updateClock(); // Initial call to set the clock immediately
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
     </script>
 {% endblock %}
