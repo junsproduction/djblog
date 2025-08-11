@@ -338,6 +338,53 @@ footer {
     font-size: 0.9em;
 }
 
+/* Footer Enhancements */
+footer.bg-dark {
+    background-color: #212529 !important;
+}
+
+footer.bg-dark .text-muted {
+    color: #adb5bd !important;
+}
+
+footer.bg-dark .text-light {
+    color: #f8f9fa !important;
+}
+
+footer.bg-dark .text-primary {
+    color: #0d6efd !important;
+}
+
+footer.bg-dark a.text-muted {
+    color: #adb5bd !important;
+    transition: color 0.2s ease;
+}
+
+footer.bg-dark a.text-muted:hover {
+    color: #f8f9fa !important;
+}
+
+footer.bg-dark a.text-light {
+    color: #f8f9fa !important;
+    transition: color 0.2s ease;
+}
+
+footer.bg-dark a.text-light:hover {
+    color: #0d6efd !important;
+}
+
+footer.bg-dark .social-links a {
+    transition: transform 0.2s ease;
+}
+
+footer.bg-dark .social-links a:hover {
+    transform: translateY(-2px);
+}
+
+footer.bg-dark .border-secondary {
+    border-color: #495057 !important;
+}
+
 .profile-picture {
     width: 150px;
     height: 150px;
