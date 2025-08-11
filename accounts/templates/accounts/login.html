@@ -11,6 +11,14 @@
                     
                     <form method="POST">
                         {% csrf_token %}
+
+                        {# Show non-field errors (e.g. invalid login) #}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                {{ form.non_field_errors|striptags }}
+                            </div>
+                        {% endif %}
                         
                         <!-- Email Field -->
                         <div class="mb-3">
@@ -24,9 +32,14 @@
                         </div>
 
                         <!-- Password Field -->
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
-                            {% render_field form.password class="form-control" placeholder="Enter your password" %}
+                            <div class="input-group">
+                                {% render_field form.password class="form-control" placeholder="Enter your password" id="passwordInput" %}
+                                <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1">
+                                    <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                                </button>
+                            </div>
                             {% if form.password.errors %}
                                 <div class="text-danger small">
                                     {{ form.password.errors }}
@@ -59,4 +72,19 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+    if (togglePassword && passwordInput && togglePasswordIcon) {
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePasswordIcon.classList.toggle('bi-eye');
+            togglePasswordIcon.classList.toggle('bi-eye-slash');
+        });
+    }
+</script>
 {% endblock %}
