@@ -13,7 +13,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djblogsite.settings')
 import django
 django.setup()
 
-# Run migrations and collect static files on first import
+# Run migrations, create superuser, and collect static files on first import
 from django.core.management import execute_from_command_line
 try:
     # Run migrations
@@ -21,6 +21,13 @@ try:
     print("✅ Migrations completed successfully")
 except Exception as e:
     print(f"❌ Migration error: {e}")
+
+try:
+    # Create superuser
+    execute_from_command_line(['manage.py', 'create_superuser'])
+    print("✅ Superuser creation attempted")
+except Exception as e:
+    print(f"❌ Superuser creation error: {e}")
 
 try:
     # Collect static files
