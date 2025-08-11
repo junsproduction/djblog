@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
+{% load blog_extras %}
 
 {% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph Meta Tags for Social Sharing -->
+<meta property="og:title" content="{{ post.title }}">
+<meta property="og:description" content="{{ post.content|truncatewords:30|striptags }}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if post.image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.image.url }}">
+{% endif %}
+<meta property="og:site_name" content="Juni's Blog">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ post.title }}">
+<meta name="twitter:description" content="{{ post.content|truncatewords:30|striptags }}">
+{% if post.image %}
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.image.url }}">
+{% endif %}
+{% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb" class="mt-3">
@@ -14,45 +35,120 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h1 class="card-title">{{ post.title }}</h1>
-            
-            <!-- Category Badge -->
-            <div class="mb-3">
-                <span class="badge bg-secondary">{{ post.category.name }}</span>
-            </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Post Header -->
+            <article class="card shadow-sm mb-4">
+                <div class="card-body p-5">
+                    <!-- Post Meta Info -->
+                    <div class="d-flex align-items-center mb-4">
+                        <img src="{{ post.author.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                             class="rounded-circle me-3" 
+                             style="width: 50px; height: 50px; object-fit: cover;"
+                             alt="{{ post.author.full_name }}">
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">{{ post.author.full_name }}</div>
+                            <div class="text-muted small">
+                                {{ post.date_posted|date:"F j, Y" }} • {{ post.content|reading_time }}
+                                {% if post.edited_at %}
+                                • Updated {{ post.edited_at|date:"M j, Y" }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge bg-light text-dark border">{{ post.category.name }}</span>
+                        </div>
+                    </div>
 
-            <!-- Post Image -->
-            {% if post.image %}
-            <div class="mb-4">
-                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded">
-            </div>
-            {% endif %}
+                    <!-- Post Title -->
+                    <h1 class="display-5 fw-bold mb-4">{{ post.title }}</h1>
 
-            <!-- Post Content -->
-            <div class="card-text mb-3">
-                {{ post.content|linebreaks }}
-            </div>
-
-            <!-- Post Metadata -->
-            <div class="text-muted">
-                <small>
-                    Posted on {{ post.date_posted|date:"F j, Y" }}
-                    {% if post.edited_at %}
-                    <br>Last edited on {{ post.edited_at|date:"F j, Y, g:i a" }}
+                    <!-- Post Image -->
+                    {% if post.image %}
+                    <div class="mb-4">
+                        <img src="{{ post.image.url }}" 
+                             alt="{{ post.title }}" 
+                             class="img-fluid rounded shadow-sm">
+                    </div>
                     {% endif %}
-                    <br>By {{ post.author }}
-                </small>
+
+                    <!-- Post Content -->
+                    <div class="post-content mb-4" style="font-size: 1.1rem; line-height: 1.7;">
+                        {{ post.content|linebreaks }}
+                    </div>
+
+                    <!-- Post Stats -->
+                    <div class="border-top pt-3 mb-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="fw-bold text-primary">{{ post.content|word_count }}</div>
+                                <small class="text-muted">Words</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold text-success">{{ post.content|reading_time }}</div>
+                                <small class="text-muted">Read Time</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold text-info">{{ post.date_posted|date:"M j" }}</div>
+                                <small class="text-muted">Published</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Share -->
+                    {% include 'partials/_social_share.html' %}
+
+                    <!-- Action Buttons for Author -->
+                    {% if user == post.author %}
+                    <div class="border-top pt-3">
+                        <h6 class="text-muted mb-2">Author Actions:</h6>
+                        <a href="{% url 'post-edit' pk=post.pk %}" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="bi bi-pencil"></i> Edit Post
+                        </a>
+                        <a href="{% url 'post-delete' pk=post.pk %}" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i> Delete Post
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+
+            <!-- Author Bio -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ post.author.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                             class="rounded-circle me-3" 
+                             style="width: 80px; height: 80px; object-fit: cover;"
+                             alt="{{ post.author.full_name }}">
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1">{{ post.author.full_name }}</h5>
+                            <p class="text-muted mb-2">
+                                Web Developer & Tech Enthusiast. Sharing insights about Django, Python, and web development.
+                            </p>
+                            <a href="{% url 'user_profile' username=post.author.full_name %}" class="btn btn-outline-primary btn-sm">
+                                View Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Action Buttons -->
-            {% if user == post.author %}
-            <div class="mt-3">
-                <a href="{% url 'post-edit' pk=post.pk %}" class="btn btn-primary btn-sm">Edit</a>
-                <a href="{% url 'post-delete' pk=post.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            <!-- Related Posts (placeholder for now) -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">More from {{ post.category.name }}</h5>
+                    <div class="row">
+                        <!-- This will be populated with related posts -->
+                        <div class="col-12">
+                            <p class="text-muted">Related posts feature coming soon...</p>
+                            <a href="{% url 'category-posts' post.category.slug %}" class="btn btn-outline-primary">
+                                Browse {{ post.category.name }} Posts
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endif %}
         </div>
     </div>
 </div>

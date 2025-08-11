@@ -131,3 +131,20 @@ def category_posts(request, slug):
         'posts': posts,
         'categories': categories,
     })
+
+def about_view(request):
+    return render(request, 'about.html')
+
+def contact_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        # Here you can add email sending logic
+        # For now, we'll just show a success message
+        messages.success(request, 'Thank you for your message! I\'ll get back to you soon.')
+        return redirect('contact')
+    
+    return render(request, 'contact.html')

@@ -347,10 +347,36 @@ footer {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.profile-picture-large {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+.profile-picture-large:hover {
+    transform: scale(1.02);
+}
+
 .profile-card {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding: 20px;
     margin-bottom: 20px;
+}
+
+/* Profile page enhancements */
+.position-relative .btn {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.card.shadow-sm {
+    transition: box-shadow 0.2s ease;
+}
+
+.card.shadow-sm:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
 }
