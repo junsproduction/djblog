@@ -13,23 +13,49 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
+# Load environment variables
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Environment variable handling
+def get_env_value(env_variable, default_value=''):
+    return os.environ.get(env_variable) or os.getenv(env_variable) or default_value
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# SECURITY SETTINGS
+SECRET_KEY = get_env_value('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is required")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = get_env_value('DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = get_env_value('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+# Add Vercel domain to allowed hosts
+if get_env_value('VERCEL_URL'):
+    ALLOWED_HOSTS.append(get_env_value('VERCEL_URL'))
+if get_env_value('VERCEL_BRANCH_URL'):
+    ALLOWED_HOSTS.append(get_env_value('VERCEL_BRANCH_URL'))
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+# Security Headers (only in production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = get_env_value('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    # Development settings
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+X_FRAME_OPTIONS = 'DENY'
 
 
 # Application definition
@@ -82,19 +108,35 @@ TEMPLATES = [
 WSGI_APPLICATION = 'djblogsite.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'junsproduction_db',
-        'USER': 'postgres',
-        'PASSWORD': 'kekkai123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+# Database Configuration
+if get_env_value('POSTGRES_URL'):
+    # Use Vercel Postgres
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=get_env_value('POSTGRES_URL'),
+            conn_max_age=600
+        )
     }
-}
+elif get_env_value('DATABASE_URL'):
+    # Use external database service
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=get_env_value('DATABASE_URL'),
+            conn_max_age=600
+        )
+    }
+else:
+    # Use local database for development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': get_env_value('DB_NAME', 'djblog'),
+            'USER': get_env_value('DB_USER', 'postgres'),
+            'PASSWORD': get_env_value('DB_PASSWORD', ''),
+            'HOST': get_env_value('DB_HOST', 'localhost'),
+            'PORT': get_env_value('DB_PORT', '5432'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -165,13 +207,13 @@ LOGIN_URL = 'login'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# Email Configuration (SMTP Gmail)
+# Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'junsproduction1@gmail.com'
-EMAIL_HOST_PASSWORD = 'arvg gpwl pplc mzwp'
+EMAIL_HOST_USER = get_env_value('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = get_env_value('EMAIL_HOST_PASSWORD')
 
 # DRF Settings
 REST_FRAMEWORK = {
