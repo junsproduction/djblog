@@ -13,12 +13,21 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djblogsite.settings')
 import django
 django.setup()
 
-# Collect static files on first import
+# Run migrations and collect static files on first import
 from django.core.management import execute_from_command_line
 try:
+    # Run migrations
+    execute_from_command_line(['manage.py', 'migrate', '--noinput'])
+    print("✅ Migrations completed successfully")
+except Exception as e:
+    print(f"❌ Migration error: {e}")
+
+try:
+    # Collect static files
     execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
-except:
-    pass  # Ignore errors during static collection
+    print("✅ Static files collected successfully")
+except Exception as e:
+    print(f"❌ Static files error: {e}")
 
 # Import the WSGI application
 from djblogsite.wsgi import application
