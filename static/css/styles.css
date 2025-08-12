@@ -314,6 +314,8 @@ footer.bg-dark.text-light h6.text-muted,
 footer.bg-dark.text-light small.text-muted {
     color: #fff !important;
     opacity: 1 !important;
+    filter: none !important;
+    background-color: transparent !important;
 }
 
 
