@@ -296,31 +296,26 @@ body {
     transform: scale(1.02);
 }
 
-/* Footer - Fixed text color with higher specificity */
+/* Footer - Force white text color and override text-muted */
+footer.bg-dark.text-light {
+    background-color: #212529 !important;
+}
+
 footer.bg-dark.text-light,
-footer.bg-dark.text-light *,
-footer.bg-dark.text-light p,
-footer.bg-dark.text-light h5,
-footer.bg-dark.text-light h6,
-footer.bg-dark.text-light small,
-footer.bg-dark.text-light a,
-footer.bg-dark.text-light .text-muted,
-footer.bg-dark.text-light a.text-muted {
+footer.bg-dark.text-light * {
     color: #fff !important;
 }
 
-footer.bg-dark.text-light a:hover,
-footer.bg-dark.text-light .text-muted:hover {
-    color: #ffd700 !important;
+footer.bg-dark.text-light .text-muted,
+footer.bg-dark.text-light a.text-muted,
+footer.bg-dark.text-light p.text-muted,
+footer.bg-dark.text-light h5.text-muted,
+footer.bg-dark.text-light h6.text-muted,
+footer.bg-dark.text-light small.text-muted {
+    color: #fff !important;
+    opacity: 1 !important;
 }
 
-footer.bg-dark.text-light .social-links a {
-    transition: transform 0.2s ease;
-}
-
-footer.bg-dark.text-light .social-links a:hover {
-    transform: translateY(-2px);
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
