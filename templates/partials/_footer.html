@@ -5,21 +5,21 @@
             <!-- About Section -->
             <div class="col-lg-4 mb-4">
                 <h5 class="text-primary mb-3">About Juni's Blog</h5>
-                <p class="text-muted">
+                <p class="mb-3">
                     Sharing insights about web development, Django, and my coding journey. 
                     Join me as I explore the world of programming and share what I learn along the way.
                 </p>
                 <div class="social-links">
-                    <a href="https://github.com/junsproduction" class="text-light me-3" target="_blank">
+                    <a href="https://github.com/junsproduction" class="text-light me-3" target="_blank" aria-label="GitHub">
                         <i class="bi bi-github fs-4"></i>
                     </a>
-                    <a href="https://linkedin.com/in/yourprofile" class="text-light me-3" target="_blank">
+                    <a href="https://linkedin.com/in/yourprofile" class="text-light me-3" target="_blank" aria-label="LinkedIn">
                         <i class="bi bi-linkedin fs-4"></i>
                     </a>
-                    <a href="https://twitter.com/yourhandle" class="text-light me-3" target="_blank">
+                    <a href="https://twitter.com/yourhandle" class="text-light me-3" target="_blank" aria-label="Twitter">
                         <i class="bi bi-twitter fs-4"></i>
                     </a>
-                    <a href="mailto:junsproduction1@gmail.com" class="text-light me-3">
+                    <a href="mailto:junsproduction1@gmail.com" class="text-light me-3" aria-label="Email">
                         <i class="bi bi-envelope fs-4"></i>
                     </a>
                 </div>
@@ -29,11 +29,11 @@
             <div class="col-lg-2 col-md-6 mb-4">
                 <h6 class="text-primary mb-3">Quick Links</h6>
                 <ul class="list-unstyled">
-                    <li><a href="{% url 'home' %}" class="text-muted text-decoration-none">Home</a></li>
-                    <li><a href="{% url 'about' %}" class="text-muted text-decoration-none">About</a></li>
-                    <li><a href="{% url 'contact' %}" class="text-muted text-decoration-none">Contact</a></li>
+                    <li><a href="{% url 'home' %}" class="text-light text-decoration-none">Home</a></li>
+                    <li><a href="{% url 'about' %}" class="text-light text-decoration-none">About</a></li>
+                    <li><a href="{% url 'contact' %}" class="text-light text-decoration-none">Contact</a></li>
                     {% if user.is_authenticated %}
-                    <li><a href="{% url 'post-new' %}" class="text-muted text-decoration-none">Write Post</a></li>
+                    <li><a href="{% url 'post-new' %}" class="text-light text-decoration-none">Write Post</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -43,20 +43,24 @@
                 <h6 class="text-primary mb-3">Categories</h6>
                 <ul class="list-unstyled">
                     {% for category in categories|slice:":5" %}
-                    <li><a href="{% url 'category-posts' category.slug %}" class="text-muted text-decoration-none">{{ category.name }}</a></li>
+                    <li>
+                        <a href="{% url 'category-posts' category.slug %}" class="text-light text-decoration-none">
+                            {{ category.name }}
+                        </a>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
 
-            <!-- Newsletter Signup -->
+            <!-- Newsletter -->
             <div class="col-lg-4 mb-4">
                 <h6 class="text-primary mb-3">Stay Updated</h6>
-                <p class="text-muted small">Subscribe to get notified about new posts and updates.</p>
+                <p class="small mb-2">Subscribe to get notified about new posts and updates.</p>
                 <form class="d-flex" id="newsletterForm">
                     <input type="email" class="form-control me-2" placeholder="Your email address" required>
                     <button class="btn btn-primary" type="submit">Subscribe</button>
                 </form>
-                <small class="text-muted">We respect your privacy. Unsubscribe at any time.</small>
+                <small class="d-block mt-1">We respect your privacy. Unsubscribe at any time.</small>
             </div>
         </div>
 
@@ -65,14 +69,14 @@
         <!-- Bottom Footer -->
         <div class="row align-items-center">
             <div class="col-md-6">
-                <p class="mb-0 text-muted small">
+                <p class="mb-0 small">
                     &copy; {{ "now"|date:"Y" }} Juni's Blog. All rights reserved.
                 </p>
             </div>
             <div class="col-md-6 text-md-end">
-                <a href="#" class="text-muted text-decoration-none small me-3">Privacy Policy</a>
-                <a href="#" class="text-muted text-decoration-none small me-3">Terms of Service</a>
-                <a href="#" class="text-muted text-decoration-none small">Sitemap</a>
+                <a href="#" class="text-light text-decoration-none small me-3">Privacy Policy</a>
+                <a href="#" class="text-light text-decoration-none small me-3">Terms of Service</a>
+                <a href="#" class="text-light text-decoration-none small">Sitemap</a>
             </div>
         </div>
     </div>
@@ -84,26 +88,19 @@
 </button>
 
 <script>
-// Newsletter form handling
+/* Newsletter form handling */
 document.getElementById('newsletterForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    const email = this.querySelector('input[type="email"]').value;
-    // You can implement actual newsletter signup here
     alert('Thank you for subscribing! (Feature coming soon)');
     this.reset();
 });
 
-// Back to top button
-window.addEventListener('scroll', function() {
-    const backToTop = document.getElementById('backToTop');
-    if (window.pageYOffset > 300) {
-        backToTop.style.display = 'block';
-    } else {
-        backToTop.style.display = 'none';
-    }
+/* Back to top button */
+window.addEventListener('scroll', () => {
+    const btn = document.getElementById('backToTop');
+    btn.style.display = window.scrollY > 300 ? 'block' : 'none';
 });
-
-document.getElementById('backToTop').addEventListener('click', function() {
+document.getElementById('backToTop').addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>

@@ -296,7 +296,7 @@ body {
     transform: scale(1.02);
 }
 
-/* Footer - Force white text color and override text-muted */
+/* FOOTER: ensure every element is light text ------------------ */
 footer.bg-dark.text-light {
     background-color: #212529 !important;
 }
@@ -306,16 +306,13 @@ footer.bg-dark.text-light * {
     color: #fff !important;
 }
 
-footer.bg-dark.text-light .text-muted,
-footer.bg-dark.text-light a.text-muted,
-footer.bg-dark.text-light p.text-muted,
-footer.bg-dark.text-light h5.text-muted,
-footer.bg-dark.text-light h6.text-muted,
-footer.bg-dark.text-light small.text-muted {
+footer.bg-dark.text-light a {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+footer.bg-dark.text-light a:hover {
     color: #fff !important;
-    opacity: 1 !important;
-    filter: none !important;
-    background-color: transparent !important;
+    text-decoration: underline !important;
 }
 
 
