@@ -1,17 +1,20 @@
 #!/bin/bash
-set -e  # exit on any error
+set -e
 
 echo "🚀  Vercel build starting…"
 
-# 1. Install Python dependencies
+# Make sure we use the correct Python interpreter
+export PATH="/opt/python3.12/bin:$PATH"
+
+# Install dependencies
 python3.12 -m pip install --upgrade pip
 python3.12 -m pip install -r requirements.txt
 
-# 2. Collect static files (output to ./staticfiles)
+# Collect static files
 echo "📦  Collecting static files…"
 python3.12 manage.py collectstatic --noinput --clear --verbosity=2
 
-# 3. (Optional) run migrations if your DB lives on Vercel
+(Optional) run migrations if your DB lives on Vercel
 python3.12 manage.py migrate --noinput
 
 echo "✅  Build complete"
