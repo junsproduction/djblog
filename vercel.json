@@ -1,21 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": {}
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb", "runtime": "python3.12" }
-    }
-  ],
+  "buildCommand": "./build.sh",
+  "outputDirectory": "staticfiles",
   "routes": [
-    { "src": "/static/(.*)", "dest": "/staticfiles/$1" },
+    { "src": "/static/(.*)", "dest": "/static/$1" },
     { "src": "/media/(.*)", "dest": "/media/$1" },
-    { "src": "/(.*)", "dest": "/api/index.py" }
-  ],
-  "outputDirectory": "staticfiles"
+    { "src": "/(.*)", "dest": "djblog/wsgi.py" }
+  ]
 }
