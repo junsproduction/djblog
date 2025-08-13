@@ -4,9 +4,7 @@
     {
       "src": "build_files.sh",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles"
-      }
+      "config": {}
     },
     {
       "src": "api/index.py",
@@ -18,5 +16,6 @@
     { "src": "/static/(.*)", "dest": "/staticfiles/$1" },
     { "src": "/media/(.*)", "dest": "/media/$1" },
     { "src": "/(.*)", "dest": "/api/index.py" }
-  ]
+  ],
+  "outputDirectory": "staticfiles"
 }
