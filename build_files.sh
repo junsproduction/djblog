@@ -14,7 +14,7 @@ python3.12 -m pip install -r requirements.txt
 echo "📦  Collecting static files…"
 python3.12 manage.py collectstatic --noinput --clear --verbosity=2
 
-(Optional) run migrations if your DB lives on Vercel
+# (Optional) run migrations if your DB lives on Vercel
 python3.12 manage.py migrate --noinput
 
 echo "✅  Build complete"
