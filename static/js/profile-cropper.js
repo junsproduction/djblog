@@ -78,12 +78,10 @@ class ProfileCropper {
             const formData = new FormData(this.elements.profileForm);
             formData.set('profile_picture', this.croppedBlob, 'profile.jpg');
 
-            fetch(this.elements.profileForm.action, {
+            fetch("/api/users/upload-avatar/", {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                }
+                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
             })
             .then(response => {
                 if (response.ok) {

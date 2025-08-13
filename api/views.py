@@ -1,10 +1,13 @@
+import uuid
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
 from .serializers import UserSerializer, PostSerializer, CategorySerializer
 from accounts.models import CustomUser
 from blog.models import Post, Category
@@ -30,6 +33,28 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'], url_path='upload-avatar',
+        parser_classes=[MultiPartParser],
+        permission_classes=[IsAuthenticated])
+    def upload_avatar(self, request):
+        """
+        POST /api/users/upload-avatar/
+        multipart/form-data: { profile_picture: <image> }
+        """
+        avatar = request.FILES.get('profile_picture')
+        if not avatar:
+            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            request.user.profile_picture.save(
+                f'{uuid.uuid4().hex}.jpg',
+                avatar,
+                save=True
+            )
+            return Response({'url': request.user.profile_picture.url}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
