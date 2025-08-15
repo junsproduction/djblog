@@ -17,6 +17,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djblogsite.settings')
 
 application = get_wsgi_application()
 
-application = WhiteNoise(application, root=os.path.join(os.path.dirname(__file__), 'staticfiles'))
+application = WhiteNoise(application, root='staticfiles', prefix='/static/')
 
 app=application
