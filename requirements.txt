@@ -25,3 +25,7 @@ python-dotenv==1.1.1
 # Dependencies
 sqlparse==0.5.3
 tzdata==2025.1
+
+# Cloudinary for media storage
+cloudinary
+cloudinary-storage
