@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'cloudinary_storage',
     'cloudinary',
 ]
 
@@ -245,4 +244,4 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': get_env_value('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'storages.backends.cloudinary.CloudinaryStorage'

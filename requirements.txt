@@ -28,4 +28,3 @@ tzdata==2025.1
 
 # Cloudinary for media storage
 cloudinary
-cloudinary-storage
