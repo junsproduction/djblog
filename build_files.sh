@@ -1,20 +1,18 @@
 #!/bin/bash
 set -e
 
-echo "🚀  Vercel build starting…"
+echo "🚀 Build phase dimulai…"
 
-# Make sure we use the correct Python interpreter
-export PATH="/opt/python3.12/bin:$PATH"
-
-# Install dependencies
-python3.12 -m pip install --upgrade pip
+# Install deps (Vercel udah otomatis, tapi biar aman)
 python3.12 -m pip install -r requirements.txt
 
-# Collect static files
-echo "📦  Collecting static files…"
-python3.12 manage.py collectstatic --noinput --clear --verbosity=2
+echo "📦 Collect static files…"
+python3.12 manage.py collectstatic --noinput --clear --verbosity=1
 
-# (Optional) run migrations if your DB lives on Vercel
+echo "🔄 Jalankan migrasi…"
 python3.12 manage.py migrate --noinput
 
-echo "✅  Build complete"
+echo "👤 Superuser (silent kalau sudah ada)…"
+python3.12 manage.py create_superuser 2>/dev/null || true
+
+echo "✅ Build selesai"
