@@ -1,7 +1,1 @@
-{
-  "buildCommand": "bash build_files.sh",
-  "outputDirectory": ".",
-  "routes": [
-    { "src": "/(.*)", "dest": "api/index.py" }
-  ]
-}
+{}
