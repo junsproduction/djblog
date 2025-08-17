@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'blog',
     'widget_tweaks',
     'accounts',
+    'api',
     'dashboard.apps.DashboardConfig',
     'imagekit',
     'rest_framework',
