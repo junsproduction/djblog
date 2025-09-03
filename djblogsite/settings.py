@@ -164,3 +164,27 @@ CORS_ALLOWED_ORIGINS = get_env_value('CORS_ALLOWED_ORIGINS', '').split(',') if n
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Vercel Configuration
+VERCEL = bool(os.getenv('VERCEL', False))
+VERCEL_BLOB_CLIENT_TOKEN = os.getenv('BLOB_READ_WRITE_TOKEN', '')
+
+if VERCEL:
+    ALLOWED_HOSTS.append('.vercel.app')
+    
+    # Database configuration for Vercel
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('POSTGRES_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+
+    # Media files with Vercel Blob
+    DEFAULT_FILE_STORAGE = 'blog.storage.VercelBlobStorage'
+    MEDIA_URL = 'https://blob.vercel-storage.com/'
+else:
+    # Local development settings
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_URL = '/media/'

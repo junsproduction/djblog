@@ -10,6 +10,10 @@ def profile_pic_path(instance, filename):
     """Generate path for profile pictures"""
     return f'profile_pics/{instance.username}/{filename}'
 
+def get_storage():
+    """Helper function to determine storage backend"""
+    return VercelBlobStorage() if getattr(settings, 'VERCEL', False) else None
+
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
@@ -21,8 +25,8 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, blank=True)
     profile_picture = models.ImageField(
-        upload_to=profile_pic_path,
-        storage=VercelBlobStorage() if settings.VERCEL else None,
+        upload_to='profile_pics/',
+        storage=get_storage(),
         null=True,
         blank=True
     )
