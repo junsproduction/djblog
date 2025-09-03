@@ -1,8 +1,8 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .models import Post, Category
-from .forms import PostForm
+from .forms import PostForm, CategoryForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from .storage import VercelBlobStorage
@@ -198,3 +198,45 @@ def contact_view(request):
         return redirect('contact')
     
     return render(request, 'contact.html')
+
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
+
+@user_passes_test(is_admin)
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'blog/category_list.html', {'categories': categories})
+
+@user_passes_test(is_admin)
+def category_create(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Category created successfully!')
+            return redirect('category_list')
+    else:
+        form = CategoryForm()
+    return render(request, 'blog/category_form.html', {'form': form, 'title': 'Create Category'})
+
+@user_passes_test(is_admin)
+def category_edit(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Category updated successfully!')
+            return redirect('category_list')
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'blog/category_form.html', {'form': form, 'title': 'Edit Category'})
+
+@user_passes_test(is_admin)
+def category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        category.delete()
+        messages.success(request, 'Category deleted successfully!')
+        return redirect('category_list')
+    return render(request, 'blog/category_confirm_delete.html', {'category': category})

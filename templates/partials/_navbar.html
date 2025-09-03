@@ -90,3 +90,21 @@
         </div>
     </div>
 </nav>
+
+<!-- In your admin dropdown menu or staff section -->
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Admin
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+        {% if user.is_staff %}
+            <!-- Add the category management link here -->
+            <li>
+                <a class="dropdown-item" href="{% url 'category_list' %}">
+                    <i class="fas fa-tags me-2"></i>Manage Categories
+                </a>
+            </li>
+            <!-- ...existing admin menu items... -->
+        {% endif %}
+    </ul>
+</li>
