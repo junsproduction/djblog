@@ -1,33 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import AbstractUser
+from blog.storage import VercelBlobStorage
+from django.conf import settings
 from django.utils import timezone
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 
-class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-    
-    def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('role', 'admin')
-        extra_fields.setdefault('is_active', True)
+def profile_pic_path(instance, filename):
+    """Generate path for profile pictures"""
+    return f'profile_pics/{instance.username}/{filename}'
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-        return self.create_user(email, password, **extra_fields)
-    
-
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
         ('editor', 'Editor'),
@@ -37,11 +20,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, blank=True)
-    profile_picture = ProcessedImageField(
-        upload_to='profile_pics',
-        processors=[ResizeToFill(300, 300)],
-        format='JPEG',
-        options={'quality': 85},
+    profile_picture = models.ImageField(
+        upload_to=profile_pic_path,
+        storage=VercelBlobStorage() if settings.VERCEL else None,
         null=True,
         blank=True
     )
@@ -49,7 +30,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
-    objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
 

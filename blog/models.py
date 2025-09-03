@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from .storage import VercelBlobStorage
+
+
+def blog_image_path(instance, filename):
+    """Generate path for blog images"""
+    return f'blog_images/{instance.slug}/{filename}'
 
 
 class Category(models.Model):
@@ -28,7 +35,12 @@ class Post(models.Model):
     edited_at = models.DateTimeField(null=True, blank=True)
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
-    image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
+    image = models.ImageField(
+        upload_to=blog_image_path,
+        storage=VercelBlobStorage() if settings.VERCEL else None,
+        null=True,
+        blank=True
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,

@@ -1,6 +1,3 @@
-# Environment variables
-.env
-
 # Python
 __pycache__/
 *.py[cod]
@@ -8,12 +5,26 @@ __pycache__/
 
 # Django
 *.log
-local_settings.py
 db.sqlite3
 media/
+staticfiles/
 
-# Virtual environment
+# Environment
+.env
+.env.local
+.venv
 env/
 venv/
-ENV/
-.vercel
+
+# Vercel
+.vercel/
+node_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Development
+*.bak
+*.swp
+*~

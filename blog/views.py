@@ -7,6 +7,8 @@ import logging
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from .storage import VercelBlobStorage
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +41,18 @@ def post_detail(request, pk):
 @login_required
 def post_new(request):
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)  # Add request.FILES here
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
+            
+            # Handle image upload for Vercel
+            if 'image' in request.FILES and settings.VERCEL:
+                image = request.FILES['image']
+                storage = VercelBlobStorage()
+                path = f'blog_images/{post.slug}/{image.name}'
+                url = storage._save(path, image)
+                post.image = url
             
             if request.user.is_staff:
                 post.status = 'published'
@@ -55,10 +65,10 @@ def post_new(request):
             if post.status == 'published':
                 return redirect('post-detail', pk=post.pk)
             else:
-                return redirect('home')  # or create a "my posts" page
+                return redirect('home')
     else:
         form = PostForm()
-    return render(request, 'blog/post_new.html', {'form': form})  # Change this line
+    return render(request, 'blog/post_new.html', {'form': form})
 
 @login_required
 def post_edit(request, pk):
@@ -67,12 +77,27 @@ def post_edit(request, pk):
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
-            post.edited_at = timezone.now()  # Only update edited_at
+            
+            # Handle image update for Vercel
+            if 'image' in request.FILES and settings.VERCEL:
+                # Delete old image if exists
+                if post.image:
+                    storage = VercelBlobStorage()
+                    storage.delete(post.image)
+                
+                # Save new image
+                image = request.FILES['image']
+                storage = VercelBlobStorage()
+                path = f'blog_images/{post.slug}/{image.name}'
+                url = storage._save(path, image)
+                post.image = url
+            
+            post.edited_at = timezone.now()
             post.save()
             return redirect('post-detail', pk=post.pk)
     else:
         form = PostForm(instance=post)
-    return render(request, 'blog/post_edit.html', {'form': form})  # Change this line too
+    return render(request, 'blog/post_edit.html', {'form': form})
 
 @login_required
 def post_delete(request, pk):

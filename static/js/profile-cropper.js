@@ -76,19 +76,40 @@ class ProfileCropper {
 
         if (this.croppedBlob) {
             const formData = new FormData(this.elements.profileForm);
-            formData.set('profile_picture', this.croppedBlob, 'profile.jpg');
+            
+            // Add cropped image with unique filename
+            const timestamp = new Date().getTime();
+            const filename = `profile_${timestamp}.jpg`;
+            formData.set('profile_picture', this.croppedBlob, filename);
 
-            fetch("/api/users/upload-avatar/", {
+            // Add indicator for Vercel environment
+            if (window.VERCEL_ENV) {
+                formData.append('is_vercel', 'true');
+            }
+
+            fetch(this.elements.profileForm.action, {
                 method: 'POST',
                 body: formData,
-                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value }
-            })
-            .then(response => {
-                if (response.ok) {
-                    window.location.reload();
+                headers: { 
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update preview with new Blob URL or local URL
+                    this.elements.previewImage.src = data.image_url;
+                    messages.success('Profile picture updated successfully!');
+                    window.location.reload();
+                } else {
+                    messages.error(data.error || 'Failed to update profile picture.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                messages.error('An error occurred while updating profile picture.');
+            });
         } else {
             this.elements.profileForm.submit();
         }

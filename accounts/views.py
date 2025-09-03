@@ -7,6 +7,9 @@ from .forms import CustomUserCreationForm, CustomAuthenticationForm, ProfileEdit
 from .utils import send_password_notification
 from blog.models import Post
 from django.contrib.auth import update_session_auth_hash
+from django.conf import settings
+from blog.storage import VercelBlobStorage
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -33,21 +36,49 @@ def login_view(request):
 
 @login_required
 def user_profile(request, username):
-    # Get the user model and profile
     User = get_user_model()
     user_profile = get_object_or_404(User, full_name=username)
     posts = Post.objects.filter(author=user_profile).order_by('-date_posted')
     
-    # Handle form submission (POST request)
     if request.method == 'POST' and request.user == user_profile:
         form = ProfileEditForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
-            # Save directly since imagekit handles the processing
-            form.save()
+            profile = form.save(commit=False)
+            
+            # Handle profile picture for Vercel environment
+            if settings.VERCEL and 'profile_picture' in request.FILES:
+                old_picture = profile.profile_picture
+                image = request.FILES['profile_picture']
+                storage = VercelBlobStorage()
+                
+                # Delete old picture if exists
+                if old_picture:
+                    storage.delete(old_picture)
+                
+                # Save new picture with cropped image
+                path = f'profile_pics/{profile.username}/{image.name}'
+                url = storage._save(path, image)
+                profile.profile_picture = url
+                
+                # Return JSON response for AJAX requests
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'image_url': url
+                    })
+            
+            profile.save()
             messages.success(request, 'Profile updated successfully!')
-            return redirect('user_profile', username=user_profile.full_name)
+            
+            if not request.headers.get('X-Requested-With'):
+                return redirect('user_profile', username=user_profile.full_name)
         else:
             messages.error(request, 'Please correct the errors below.')
+            if request.headers.get('X-Requested-With'):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Invalid form data'
+                })
     else:
         form = ProfileEditForm(instance=user_profile)
     

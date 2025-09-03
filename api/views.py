@@ -1,11 +1,10 @@
 import uuid
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, parsers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from .serializers import UserSerializer, PostSerializer, CategorySerializer
@@ -27,6 +26,7 @@ class CustomAuthToken(ObtainAuthToken):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
@@ -35,7 +35,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=False, methods=['post'], url_path='upload-avatar',
-        parser_classes=[MultiPartParser],
         permission_classes=[IsAuthenticated])
     def upload_avatar(self, request):
         """
@@ -59,6 +58,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
