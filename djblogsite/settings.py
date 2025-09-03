@@ -188,3 +188,28 @@ else:
     # Local development settings
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/media/'
+
+# After DEBUG setting
+if DEBUG:
+    TEMPLATES[0]['OPTIONS']['debug'] = True
+
+# Add logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+        'blog': {  # Add logger for your app
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    },
+}

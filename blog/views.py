@@ -14,18 +14,37 @@ logger = logging.getLogger(__name__)
 
 
 def home(request):
-    if request.user.is_staff:
-        # Staff can see all posts
-        posts = Post.objects.all().order_by('-date_posted')
-    else:
-        # Regular users only see published posts
-        posts = Post.objects.filter(status='published').order_by('-date_posted')
-    
-    paginator = Paginator(posts, 5)
-    page = request.GET.get('page')
-    posts = paginator.get_page(page)
-    
-    return render(request, 'home.html', {'posts': posts})
+    try:
+        # Get posts with proper handling
+        if request.user.is_staff:
+            posts = Post.objects.all().select_related('author', 'category').order_by('-date_posted')
+        else:
+            posts = Post.objects.filter(status='published').select_related('author', 'category').order_by('-date_posted')
+        
+        # Add pagination
+        paginator = Paginator(posts, 5)
+        page = request.GET.get('page')
+        posts = paginator.get_page(page)
+        
+        # Add context variables that template expects
+        context = {
+            'posts': posts,
+            'greeting': 'Active',  # Your template expects this
+            'posts_count': posts.count(),  # For stats section
+        }
+        
+        logger.info(f"Home page loaded with {posts.count()} posts")
+        return render(request, 'home.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in home view: {e}")
+        messages.error(request, "There was an error loading the page.")
+        # Return minimal context to avoid template errors
+        return render(request, 'home.html', {
+            'posts': [],
+            'greeting': 'Error',
+            'posts_count': 0,
+        })
 
 @login_required
 def post_detail(request, pk):
