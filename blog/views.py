@@ -3,47 +3,53 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .models import Post, Category
 from .forms import PostForm
-import logging
-from django.contrib import messages
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from .storage import VercelBlobStorage
 from django.conf import settings
+import logging
+from django.contrib import messages
 
 logger = logging.getLogger(__name__)
 
 
 def home(request):
     try:
-        # Get posts with proper handling
+        # Get posts based on user role
         if request.user.is_staff:
-            posts = Post.objects.all().select_related('author', 'category').order_by('-date_posted')
+            posts_list = Post.objects.all().select_related('author', 'category')
         else:
-            posts = Post.objects.filter(status='published').select_related('author', 'category').order_by('-date_posted')
+            posts_list = Post.objects.filter(status='published').select_related('author', 'category')
+        
+        # Get total count before pagination
+        total_posts = posts_list.count()
         
         # Add pagination
-        paginator = Paginator(posts, 5)
-        page = request.GET.get('page')
-        posts = paginator.get_page(page)
+        paginator = Paginator(posts_list.order_by('-date_posted'), 6)  # 6 posts per page
+        page = request.GET.get('page', 1)
         
-        # Add context variables that template expects
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+
         context = {
             'posts': posts,
-            'greeting': 'Active',  # Your template expects this
-            'posts_count': posts.count(),  # For stats section
+            'posts_count': total_posts,  # Use total count from before pagination
+            'page_obj': posts,  # For pagination template
         }
         
-        logger.info(f"Home page loaded with {posts.count()} posts")
         return render(request, 'home.html', context)
         
     except Exception as e:
         logger.error(f"Error in home view: {e}")
         messages.error(request, "There was an error loading the page.")
-        # Return minimal context to avoid template errors
         return render(request, 'home.html', {
             'posts': [],
-            'greeting': 'Error',
             'posts_count': 0,
+            'page_obj': None,
         })
 
 @login_required
