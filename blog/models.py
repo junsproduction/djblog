@@ -12,11 +12,14 @@ def blog_image_path(instance, filename):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)  # Add this field
     slug = models.SlugField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = "categories"
+        ordering = ['name']
 
     def __str__(self):
         return self.name
