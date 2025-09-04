@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "djblogsite/wsgi.py",
+      "src": "djblogsite/index.py",
       "use": "@vercel/python"
     }
   ],
@@ -12,7 +12,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "djblogsite/wsgi.py"
+      "dest": "djblogsite/index.py"
     }
   ]
 }
